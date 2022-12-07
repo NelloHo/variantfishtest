@@ -101,45 +101,44 @@ class GUI():
 		self.message = []
 		if self.engine:
 			self.engine.process.terminate()
-			with self.pipe.mutex:
-				self.pipe.queue.clear()
-			print('engine end')
+		with self.pipe.mutex:
+			self.pipe.queue.clear()
+		print('engine end')
 
 		def producer():                        # keep catching info from subprocess
 			with self.producer_lock:
 				print('producer start')
-				counter = 0; flag = 0; start_count = False
 				for line in self.engine.read():
-					print('ADD : add {} into queue'.format(line.strip() if line != "\n" else line))
 					self.pipe.put(line)
-					if line.startswith('time'):
-						flag += 1
-					if flag == 2:
-						start_count = True
-					if start_count:
-						counter += 1
-						if counter == 5:
-							break
-				print('process end')
+					print('ADD : add {} into queue'.format(line.strip() if line != "\n" else line))
+				print('engine end')
 				print(f'there are still {self.pipe.qsize()} line need to be processed')
 				print('producer end')
-			
 		
 		def consumer():                        # read from pipe and blit it on screen
 			with self.consumer_lock:
 				print('consumer start')
+				counter = 0; flag = 0; start_count = False
 				try:
 					while not self.pipe.empty() or self.engine.process.poll() is None:
 						line = self.pipe.get()
 						self.message.append(line)
-						print(line,end='',flush=True)
 						self.window['engine_output'].update(''.join(self.message))
+						print(f'SET : {line} from queue',flush=True)
+						if line.startswith('-----'):
+							flag += 1
+						if flag == 2:
+							start_count = True
+						if start_count:
+							counter += 1
+							if counter == 8:
+								print('end count')
+								break
 				except RuntimeError:
 					pass
 				self.window['result'].update(''.join(self.message[-7:]))
 				print('consumer end')
 				
-
 		with self.consumer_lock:                       # gain the lock when threads all end
 			with self.producer_lock:
 				print('engine start')
@@ -170,11 +169,8 @@ class GUI():
 				' -i '+increment if increment else '',	 
 			)
 			print(command)
-			self.message = []
 			self.window['engine_output'].update(f'> {command}\nstart \n{"="*20}')
 			self.load_engine(command)
-
-
 
 	def start(self):
 		while True:
@@ -185,7 +181,6 @@ class GUI():
 
 			elif event == 'fsf_variants':
 				variant = self.popup(sg.Listbox, 'variant',pyffish.variants(),size=(30,20))
-				print(variant)
 				if variant:
 					self.window['fsf_variant'].update(variant[0]) 
 
@@ -200,11 +195,14 @@ class GUI():
 						book = values['book'],
 						total_games = values['games'],
 						time = values['time'],
-						increment = values['i']
-					)
+						increment = values['i'])
+						
 			elif event == 'export':
-				print(self.message[-1:])
-				self.export_chart(self.message[-1:],values['fsf_variant'].strip())
+				if not self.message:
+					pass
+				else:
+					print(self.message[-1:])
+					self.export_chart(self.message[-1:],values['fsf_variant'].strip())
 
 		self.window.close()
 		return

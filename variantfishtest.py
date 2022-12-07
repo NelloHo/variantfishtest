@@ -30,6 +30,7 @@ def sprt_stats(scores, elo1, elo2):
 def print_scores(scores):
     return "Total: %d W: %d L: %d D: %d" % (sum(scores), scores[0], scores[1], scores[2])
 
+sys.stdout.reconfigure(line_buffering=True)
 
 class EngineMatch:
     """Compare two UCI engines by running an engine match."""
