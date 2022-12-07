@@ -124,7 +124,7 @@ class GUI():
 						line = self.pipe.get()
 						self.message.append(line)
 						self.window['engine_output'].update(''.join(self.message))
-						print(f'SET : {line} from queue',flush=True)
+						print(f'SET : {line.strip()} from queue',flush=True)
 						if line.startswith('-----'):
 							flag += 1
 						if flag == 2:
@@ -132,7 +132,6 @@ class GUI():
 						if start_count:
 							counter += 1
 							if counter == 8:
-								print('end count')
 								break
 				except RuntimeError:
 					pass

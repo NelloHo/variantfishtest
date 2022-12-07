@@ -3,7 +3,7 @@ import os
 import random
 import warnings
 import argparse
-
+import time
 import stat_util
 import chess.uci
 
@@ -250,6 +250,8 @@ class EngineMatch:
         else:
             self.out.write(elo_stats(self.scores))
         self.out.write(print_scores(self.scores) + "\n")
+        time.sleep(0.3)
+        quit()
 
 
 if __name__ == "__main__":
