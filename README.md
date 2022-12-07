@@ -11,6 +11,7 @@ Run `python variantfishtest.py -h` for instructions on usage.
 ### USAGE
 
 You need to have python and pip on your PC.
+see: https://www.python.org/
 
 Open cmd, `cd` to this variantfishtest directory , then type
 ```
