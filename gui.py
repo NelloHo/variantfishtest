@@ -69,7 +69,7 @@ class GUI():
 		self.pipe = queue.Queue()              # let producer keep reading info from subprocess, then thow it to pipe
 		                                       # in order not to miss info when subprocess end and kill Pipe.
 
-		self.producer_lock = threading.Lock()         # make sure only one thread is working at a time
+		self.producer_lock = threading.Lock()         # make sure only one engine process is working at a time
 		self.consumer_lock = threading.Lock()
 
 	@staticmethod
